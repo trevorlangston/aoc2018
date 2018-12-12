@@ -1,30 +1,29 @@
 from helper import parse_file
+from collections import Counter
 
 
 def main():
     guard_data = parse_file()
-    profiles = []
+    profile = [[] for _ in range(60)]
 
     for guard_id, events in guard_data.iteritems():
-        profile = [0] * 60
-
         for event in events:
             start = event[0]
             end = event[1]
             for i in range(start, end):
-                profile[i] += 1
-            profiles.append((guard_id, profile))
+                profile[i].append(guard_id)
 
     best_minute = None
     highest_freq = 0
-    guard_id = None
 
-    for profile in profiles:
-        m = max(profile[1])
-        if m > highest_freq:
-            highest_freq = m
-            best_minute = profile[1].index(m)
-            guard_id = profile[0]
+    for minute in range(len(profile)):
+        guards = profile[minute]
+        if len(guards) > highest_freq:
+            best_minute = minute + 1
+            highest_freq = len(guards)
+
+    c = Counter(profile[best_minute])
+    guard_id = c.most_common(1)[0][0]
 
     return guard_id * best_minute
 
